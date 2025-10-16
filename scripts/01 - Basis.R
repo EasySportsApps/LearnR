@@ -6,8 +6,19 @@ remotes::install_github("talgalili/installr") # Install a package from GitHub us
 pak::pak("talgalili/installr") # Install a package from GitHub using "pak" package (faster, resolves dependencies)
 remove.packages("remotes") # Remove/uninstall a specific package (e.g., "remotes")
 
+# 📦 Installation (alternative version) ####
+packages_list <- c("installr", "remotes", "pak", "MASS", "ggplot2") # List of required packages available on CRAN
+for (pkg in packages_list) {  # Loop over each package in the list
+  if (!requireNamespace(pkg, quietly = TRUE)) { # Check if the package is NOT installed
+    install.packages(pkg) # Install the package from CRAN if missing
+    message(pkg, " has been installed.") # Inform the user that the package was installed
+  } else { # If the package is already installed
+    message(pkg, " is already installed.") # Inform the user that the package is available
+  }
+}
+
 # 🔄 Update R ####
-library("installr") # Load installr package
+library("installr") # Load "installr" package
 updateR(copy.packages = TRUE) # Update R and copy all user-installed packages to the new version
 
 # 🔄 Update RStudio ####
