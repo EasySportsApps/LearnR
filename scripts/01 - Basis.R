@@ -1,6 +1,7 @@
 # 📦 Installation and removal ####
 browseURL("https://cran.r-project.org/") # Open the official R download website
 browseURL("https://posit.co/downloads/") # Open the official RStudio download website
+browseURL("https://positron.posit.co/download.html") # Open the official Positron download website
 install.packages(c("installr", "remotes", "pak", "MASS", "ggplot2")) # Install multiple packages from CRAN
 remotes::install_github("talgalili/installr") # Install a package from GitHub using "remotes" package
 pak::pak("talgalili/installr") # Install a package from GitHub using "pak" package (faster, resolves dependencies)
