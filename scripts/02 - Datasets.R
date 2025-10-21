@@ -280,16 +280,206 @@ stop_for_status(response) # Check if the HTTP request was successful; stops exec
 temp_file <- tempfile(fileext = ".xlsx") # Create a temporary file to store the downloaded XLSX content
 writeBin(content(response, "raw"), temp_file) # Write the raw binary content of the response to the temporary file
 
-df_list <- import_list(temp_file) # Import all sheets from the XLSX file into a list of data frames; each sheet becomes an element in the list
 
-for (sheet_name in names(df_list)) { # Loop through each sheet name in the list
-  name_clean <- stri_trans_general(sheet_name, "Latin-ASCII") # Convert accented characters (like Á, Ñ) to their plain ASCII equivalent (A, N)
-  name_clean <- tolower(name_clean) # Convert the now-clean name to lowercase
-  name_clean <- str_replace_all(name_clean, "[^a-z0-9]", "_") # Replace spaces and any remaining non-alphanumeric characters with underscores
-  name_clean <- str_replace_all(name_clean, "_+", "_") # Collapse multiple consecutive underscores into a single one
-  name_clean <- str_replace(name_clean, "^_|_$", "") # Remove leading or trailing underscores
-  df_name <- paste0("df_", name_clean) # Add the prefix 'df_'
-  assign(df_name, df_list[[sheet_name]], envir = .GlobalEnv) # Assign each sheet as a separate data frame in the global environment
+df_list_raw <- import_list(temp_file) # Import all sheets into a list of dataframes
+df_list <- list() # Initialize list to store cleaned dataframes
+
+for (sheet_name in names(df_list_raw)) { # Loop through each sheet in the list
+  name_clean <- stri_trans_general(sheet_name, "Latin-ASCII") # Convert accented characters (like Á, Ñ) to ASCII
+  name_clean <- tolower(name_clean) # Convert to lowercase
+  name_clean <- str_replace_all(name_clean, "[^a-z0-9]", "_") # Replace spaces/non-alphanumeric with underscores
+  name_clean <- str_replace_all(name_clean, "_+", "_") # Collapse multiple consecutive underscores
+  name_clean <- str_replace(name_clean, "^_|_$", "") # Remove leading/trailing underscores
+  
+  df_name <- paste0("df_", name_clean) # Add prefix 'df_'
+  
+  df_list[[df_name]] <- df_list_raw[[sheet_name]] # Store dataframe in the cleaned list
+  assign(df_name, df_list[[df_name]], envir = .GlobalEnv) # Optionally assign to global environment
 }
 
 unlink(temp_file) # Delete the temporary file to clean up and free system resources
+
+df_list <- df_list[setdiff(names(df_list), "df_total")] # Remove the dataframe named "df_total" from the list "df_list"
+
+rm(packages_list, pkg, response, temp_file, df_list_raw, sheet_name, name_clean, df_name, df_total) # Remove unnecessary objects from the environment
+
+# 🔧 Data manipulation ####
+packages_list <- c("dplyr", "tidyr", "stringr", "purrr")  # List of required packages available on CRAN
+for (pkg in packages_list) {  # Loop over each package in the list
+  if (!requireNamespace(pkg, quietly = TRUE)) { # Check if the package is NOT installed
+    install.packages(pkg) # Install the package from CRAN if missing
+    message(pkg, " has been installed.") # Inform the user that the package was installed
+  } else { # If the package is already installed
+    message(pkg, " is already installed.") # Inform the user that the package is available
+  }
+}
+lapply(packages_list, library, character.only = TRUE) # Load multiple packages
+
+# Clean and transform "df_ajedrez"
+df_ajedrez_clean <- df_ajedrez |>
+  
+  # Create the "deporte" column
+  mutate(
+    deporte = str_to_title(trimws(sub("\\..*", "", names(df_ajedrez)[2])))
+  ) |>
+  
+  # Assign appropriate column names
+  setNames(c(
+    "id", "universidad",
+    "m_oro", "m_plata", "m_bronce", "m_total",
+    "f_oro", "f_plata", "f_bronce", "f_total",
+    "x_oro", "x_plata", "x_bronce", "x_total", 
+    "total_general", "deporte")
+  ) |>
+  
+  # Remove all columns containing "total" (case-insensitive)
+  select(
+    -contains("total", ignore.case = TRUE)
+  ) |>
+  
+  # Keep rows where 'id' is not NA and 'universidad' does not contain "TOTAL"
+  filter(
+    !is.na(id), 
+    !grepl(x = universidad, pattern = "TOTAL", ignore.case = TRUE)
+  ) |>
+  
+  # Modify and format columns
+  mutate(
+    id = as.integer(row_number()), # Renumber column "id" as integer
+    universidad = as.factor(universidad), # Convert "universidad" to factor
+    tipo = if_else(between(id, 1, 49), true = "Pública", false = "Privada"), # Classify universities as public or private
+    tipo = factor(x = tipo, levels = c("Pública", "Privada")), # Convert "tipo" to factor with explicit levels
+    deporte = as.factor(deporte), # Convert "deporte" to factor
+    across(c(m_oro:x_bronce), ~ replace_na(as.numeric(.x), 0)) # Convert medal columns to numeric and replace NA with 0
+  ) |>
+  
+  # Reorder columns
+  select(
+    id, universidad, tipo, deporte, m_oro:x_bronce
+  ) |>
+  
+  # Reshape wide medal columns into long format
+  pivot_longer(
+    cols = c(m_oro:x_bronce), # Columns to pivot
+    names_pattern = "(.)_(oro|plata|bronce)",  # Extract gender and medal
+    names_to = c("sexo", ".value") # Split column names into 'sexo' and medal type
+  ) |>
+  
+  # Modify and format columns
+  mutate(
+    sexo = factor(x = sexo, levels = c("m", "f", "x"), labels = c("Masculino", "Femenino", "Mixto")) # Convert "sexo" to factor with explicit levels and labels
+  ) |>
+  
+  # Rename final columns
+  select(
+    Id = id,
+    Universidad = universidad,
+    Tipo = tipo,
+    Deporte = deporte,
+    Sexo = sexo,
+    Oro = oro,
+    Plata = plata,
+    Bronce = bronce
+  ) |>
+  
+  # Sort rows by university ID and gender order
+  arrange(Id, match(Sexo, c("Masculino", "Femenino", "Mixto")))
+
+# Function to clean and combine multiple datasets
+clean_and_combine_df <- function(dataframes_list) {
+  
+  # Apply the pipeline to each dataframe in the list
+  df_combined <- map_dfr(dataframes_list, ~ .x |>
+                           
+                           # Create the "deporte" column
+                           mutate(
+                             deporte = str_to_title(trimws(sub("\\..*", "", names(.x)[2])))
+                           ) |>
+                           
+                           # Assign appropriate column names
+                           setNames(c(
+                             "id", "universidad",
+                             "m_oro", "m_plata", "m_bronce", "m_total",
+                             "f_oro", "f_plata", "f_bronce", "f_total",
+                             "x_oro", "x_plata", "x_bronce", "x_total", 
+                             "total_general", "deporte"
+                           )) |>
+                           
+                           # Remove all columns containing "total" (case-insensitive)
+                           select(
+                             -contains("total", ignore.case = TRUE)
+                           ) |>
+                           
+                           # Keep rows where 'id' is not NA and 'universidad' does not contain "TOTAL"
+                           filter(
+                             !is.na(id),
+                             !grepl("TOTAL", universidad, ignore.case = TRUE)
+                           ) |>
+                           
+                           # Modify and format columns
+                           mutate(
+                             id = as.integer(row_number()), # Renumber column "id" as integer
+                             universidad = as.factor(universidad), # Convert "universidad" to factor
+                             tipo = if_else(between(id, 1, 49), "Pública", "Privada"), # Classify universities as public or private
+                             tipo = factor(tipo, levels = c("Pública", "Privada")), # Convert "tipo" to factor with explicit levels
+                             deporte = as.factor(deporte), # Convert "deporte" to factor
+                             across(c(m_oro:x_bronce), ~ replace_na(as.numeric(.x), 0)) # Convert medal columns to numeric and replace NA with 0
+                           ) |>
+                           
+                           # Reorder columns
+                           select(
+                             id, universidad, tipo, deporte, m_oro:x_bronce
+                           ) |>
+                           
+                           # Reshape wide medal columns into long format
+                           pivot_longer(
+                             cols = c(m_oro:x_bronce), # Columns to pivot
+                             names_pattern = "(.)_(oro|plata|bronce)", # Extract gender and medal
+                             names_to = c("sexo", ".value") # Split column names into 'sexo' and medal type
+                           ) |>
+                           
+                           # Modify and format columns
+                           mutate(
+                             sexo = factor(sexo, levels = c("m", "f", "x"), labels = c("Masculino", "Femenino", "Mixto")) # Convert "sexo" to factor with explicit levels and labels
+                           ) |>
+                           
+                           # Rename final columns
+                           select(
+                             Id = id,
+                             Universidad = universidad,
+                             Tipo = tipo,
+                             Deporte = deporte,
+                             Sexo = sexo,
+                             Oro = oro,
+                             Plata = plata,
+                             Bronce = bronce
+                           )
+  )
+  
+  # Sort rows by university ID, sport, and gender
+  df_combined <- df_combined |>
+    arrange(Id, Deporte, match(Sexo, c("Masculino", "Femenino", "Mixto"))
+    )
+  
+  return(df_combined)
+}
+
+df_total_medallero_ceu_2024 <- clean_and_combine_df(list(df_ajedrez, df_atletismo)) # Combine specific dataframes into a single cleaned dataset
+df_total_medallero_ceu_2024 <- clean_and_combine_df(df_list) # Combine all dataframes stored in the list "df_list"
+
+df_total_medallero_ceu_2024 <- df_total_medallero_ceu_2024 |>
+  filter(!(Oro == 0 & Plata == 0 & Bronce == 0)) # Keep only rows where not all medal counts are zero
+
+rm(packages_list, pkg) # Remove unnecessary objects from the environment
+
+# library(dplyr)
+# df_totales_uni <- df_total_medallero_ceu_2024 |>
+#   group_by(Universidad) |>
+#   summarise(
+#     Oro = sum(Oro),
+#     Plata = sum(Plata),
+#     Bronce = sum(Bronce),
+#     Total = Oro + Plata + Bronce
+#   ) |>
+#   arrange(desc(Total))
+
