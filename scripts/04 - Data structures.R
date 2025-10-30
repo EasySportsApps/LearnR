@@ -19,6 +19,8 @@ combined_vector <- c(vector1, vector2, vector3, vector4) # Combine all vectors i
 combined_vector # Display the combined vector
 class(combined_vector) # Check the data type of the combined vector
 
+sort(x = c(vector1, vector2), decreasing = TRUE) # Sort combined numeric vectors in descending order
+sort(x = c(vector1, vector2), decreasing = FALSE) # Sort combined numeric vectors in ascending order
 sum(vector1) # Sum of numeric vector elements
 mean(vector2) # Mean of numeric sequence
 plot(vector2) # Basic plotting
@@ -99,6 +101,7 @@ smoke <- factor(sample(x = c(0, 1), size = n, replace = TRUE), levels = c(0, 1),
 bmi <- round(x = rnorm(n = n, mean = 25, sd = 5), digits = 2) # Generate 20 BMIs randomly, normally distributed (mean = 25, SD = 5), rounded to 2 decimals
 
 df <- data.frame(Id = id, Age = age, Sex = sex, BMI = bmi, Smoke = smoke) # Create dataframe
+df$Id <- as.integer(df$Id) # Convert Id variable to integer
 
 View(x = df, title = "Dataframe created") # Open dataframe in spreadsheet-style viewer
 df # Display entire dataframe in console
@@ -111,12 +114,9 @@ length(df) # Show number of variables
 names(df) # Show variable names
 class(df) # Show object type
 
-df$Id <- as.integer(df$Id) # Convert Id variable to integer
+df <- df[order(df$Id, decreasing = FALSE), ]  # Sort dataframe rows by ID in ascending order
 sapply(X = df, FUN = class) # Show variable types as a vector
 lapply(X = df, FUN = class) # Show variable types as a list
-
-summary(df) # Show basic descriptive statistics for all variables
-table(df$Sex) # Display frequency table for Sex variable
 
 df[1,] # Access first row of the dataframe
 df[,1] # Access first column of the dataframe
