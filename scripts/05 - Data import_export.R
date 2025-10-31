@@ -231,7 +231,7 @@ df_iris_semicolon_csv_github <- import( # Import public Github CSV dataset with 
   file = "https://raw.githubusercontent.com/EasySportsApps/LearnR/refs/heads/main/datasets/iris_semicolon.csv"
 ) 
 
-df_iris_riolib_xlsx_local <- import( # Import public Github XLSX dataset
+df_iris_riolib_xlsx_local <- import( # Import local Github XLSX dataset 
   file = file.path(output_dir, "iris_riolib.xlsx")
 ) 
 
