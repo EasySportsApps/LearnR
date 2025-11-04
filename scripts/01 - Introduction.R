@@ -3,13 +3,15 @@ browseURL("https://cran.r-project.org/") # Open the official R download website
 browseURL("https://posit.co/downloads/") # Open the official RStudio download website
 browseURL("https://positron.posit.co/download.html") # Open the official Positron download website
 
+
+
 # 📦 Install R packages ####
 install.packages(c("installr", "remotes", "rstudioapi", "pak", "MASS", "ggplot2")) # Install multiple packages from CRAN
 remotes::install_github("talgalili/installr") # Install a package from GitHub using "remotes" package
 pak::pak("talgalili/installr") # Install a package from GitHub using "pak" package (faster, resolves dependencies)
 remove.packages("remotes") # Remove/uninstall a specific package (e.g., "remotes")
 
-# 🔁 Check, install, and load R packages with loop ####
+# 📦 Check, install, and load R packages using a loop ####
 packages_list <- c("installr", "remotes", "rstudioapi", "pak", "MASS", "ggplot2") # List of required packages available on CRAN
 for (pkg in packages_list) {  # Loop over each package in the list
   if (!requireNamespace(pkg, quietly = TRUE)) {  # Check if the package is NOT installed
@@ -21,13 +23,12 @@ for (pkg in packages_list) {  # Loop over each package in the list
   suppressPackageStartupMessages(library(pkg, character.only = TRUE))  # Load the package quietly
   message(pkg, " version ", as.character(packageVersion(pkg)), " has been loaded successfully.\n")  # Inform the user that the package was loaded and display its version
 }
-rm(pkg, packages_list) # Remove temporary objects from the workspace to keep it clean
 
-# ⚙️ Check, install, and load R packages with function ####
-source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R") # Load the external function from GitHub
-packages_list <- c("installr", "remotes", "rstudioapi", "pak", "MASS", "ggplot2") # List of required packages available on CRAN
-check_install_load_packages(packages_list) # Use the function
-rm(packages_list, check_install_load_packages) # Remove temporary objects from the workspace to keep it clean 
+# 📦 Check, install, and load R packages using a custom function ####
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R") # Load a custom function from GitHub
+check_install_load_packages(c("installr", "remotes", "rstudioapi", "pak", "MASS", "ggplot2")) # Execute the custom function to check, install, and load all required packages
+
+
 
 # 🔄 Update R-related software ####
 R.home() # Display the directory path where the current version of R is installed
@@ -46,11 +47,15 @@ update.packages(oldPkgs = "abind", ask = TRUE) # Update a specific package
 remotes::install_version("abind", version = "1.4-5", repos = "https://cran.r-project.org") # Install older version via remotes
 pak::pak("cran/abind@1.4-5") # Install older version via pak (faster, resolves dependencies)
 
+
+
 # 🆘 Help ####
 help.start() # Open the main R help page
 library(help = "base") # List all functions and datasets in any installed package (e.g., "base")
 help("mean") # Display the help page for a specific function or package (e.g., "mean")
 ?mean # Shortcut to display the help page for a specific function or package (e.g., "mean")
+
+
 
 # 🔧 Utilities ####
 sessionInfo() # Display detailed R session info (R version, OS, locale, base packages loaded, other packages loaded)

@@ -26,6 +26,8 @@ mean(vector2) # Mean of numeric sequence
 plot(vector2) # Basic plotting
 length(vector4) # Count elements in a character vector
 
+
+
 # 📦 List (one-dimensional data structure with mixed data types) ####
 vector1 <- c(1, 2, 3, 4) # Create a numeric vector
 vector2 <- c("a", "b", "c", "d") # Create a character vector
@@ -39,6 +41,8 @@ sum(list1[[1]]) # Sum of numeric vector stored in the list
 length(list1[[2]]) # Count elements of character vector in the list
 list1[[1]] + 10 # Add 10 to each element of numeric vector in the list
 paste(list1[[2]], "1", sep = "") # Append "1" to each character element in the list
+
+
 
 # 🧮 Matrix (two-dimensional data structure with the same data type) ####
 matrix1 <- matrix(data = c(1, 2, 3), nrow = 3, ncol = 1) # Create a matrix with 3 rows and 1 column
@@ -70,6 +74,8 @@ colMeans(matrix_cbind) # Mean of each column
 t(matrix_cbind) # Transpose of a matrix
 matrix_cbind * matrix_cbind # Element-wise product
 
+
+
 # 🧩 Array (multi-dimensional data structure with the same data type) ####
 array1 <- array(data = 1:8, dim = c(2, 2, 2)) # Create a 3D array: 2 rows × 2 columns × 2 layers
 array1 # Display the 3D array
@@ -89,6 +95,8 @@ array1[,,1] # Access first layer
 array1[,,2] # Access second layer
 apply(X = array1, MARGIN = c(1,2), FUN = sum) # Sum across layers
 mean(array2) # Mean of all elements in a 4D array
+
+
 
 # 🗂️ Dataframe (two-dimensional data structure with mixed data types) ####
 set.seed(123) # Reproducible results

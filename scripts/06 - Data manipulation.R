@@ -1,14 +1,6 @@
 # 📥 Import dataset from Private GitHub raw URL ####
-packages_list <- c("httr", "rio", "usethis", "stringr", "stringi") 
-for (pkg in packages_list) {
-  if (!requireNamespace(pkg, quietly = TRUE)) {
-    install.packages(pkg)
-    message(pkg, " has been installed.")
-  } else {
-    message(pkg, " is already installed.")
-  }
-}
-lapply(packages_list, library, character.only = TRUE) 
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R")
+check_install_load_packages(c("httr", "rio", "usethis", "stringr", "stringi"))
 
 edit_r_environ()
 Sys.getenv("GITHUB_TOKEN")
@@ -33,21 +25,13 @@ for (sheet_name in names(df_list_raw)) { #
 }
 unlink(temp_file)
 df_list <- df_list[setdiff(names(df_list), "df_total")]
-rm(packages_list, pkg, response, temp_file, df_list_raw, sheet_name, name_clean, df_name, df_total)
+rm(response, temp_file, df_list_raw, sheet_name, name_clean, df_name, df_total)
+
+
 
 # 1️⃣ Data manipulation of a dataset ####
-
-# Load packages
-packages_list <- c("dplyr", "tidyr", "stringr", "purrr") 
-for (pkg in packages_list) {
-  if (!requireNamespace(pkg, quietly = TRUE)) {
-    install.packages(pkg)
-    message(pkg, " has been installed.")
-  } else {
-    message(pkg, " is already installed.")
-  }
-}
-lapply(packages_list, library, character.only = TRUE) 
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R")
+check_install_load_packages(c("dplyr", "tidyr", "stringr"))
 
 # Clean and transform a dataset
 df_ajedrez_clean <- df_ajedrez |>
@@ -119,7 +103,11 @@ df_ajedrez_clean <- df_ajedrez |>
   # Sort rows by university ID and gender order
   arrange(Id, match(Sexo, c("Masculino", "Femenino", "Mixto")))
 
+
+
 # 🔢 Data manipulation of multiple datasets ####
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R")
+check_install_load_packages(c("dplyr", "tidyr", "stringr", "purrr"))
 
 # Function to clean, transform, and combine multiple datasets
 clean_and_combine_df <- function(dataframes_list) {
@@ -210,22 +198,11 @@ df_total_medallero_ceu_2024 <- clean_and_combine_df(df_list)
 df_total_medallero_ceu_2024 <- df_total_medallero_ceu_2024 |>
   filter(!(Oro == 0 & Plata == 0 & Bronce == 0)) 
 
-# Remove unnecessary objects from the environment
-rm(packages_list, pkg, clean_and_combine_df) 
+
 
 # 🧮 Totals calculation ####
-
-# Load packages
-packages_list <- c("dplyr")
-for (pkg in packages_list) {
-  if (!requireNamespace(pkg, quietly = TRUE)) {
-    install.packages(pkg)
-    message(pkg, " has been installed.")
-  } else {
-    message(pkg, " is already installed.")
-  }
-}
-library("dplyr") 
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R")
+check_install_load_packages("dplyr")
 
 # Totals by university
 df_totales_uni <- df_total_medallero_ceu_2024 |> # Use the cleaned dataset

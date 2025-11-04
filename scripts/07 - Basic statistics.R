@@ -12,8 +12,9 @@ df <- data.frame(Id = id, Age = age, Sex = sex, BMI = bmi, Smoke = smoke) # Crea
 df$Id <- as.integer(df$Id) # Convert Id variable to integer
 df$Sex[c(3, 10)] <- NA # Introduce missing values (NA) in rows 3 and 10 of the Sex variable
 
-# 📈 Description of quantitative data ####
 
+
+# 📈 Description of quantitative data ####
 summary(object = df$Age, quantile.type = 7) # Summary of age
 fivenum(x = df$Age, na.rm = TRUE) # Tukey's five-number summary of age (min, Q1, median, Q2, max)
 
@@ -39,8 +40,9 @@ cor.test(x = df$Age, y = df$BMI, use = "pairwise.complete.obs", method = "pearso
 # type = 7 → R default / Excel weighted average
 # na.rm = TRUE → remove NAs before calculation
 
-# 🗃️ Description of categorical data ####
 
+
+# 🗃️ Description of categorical data ####
 summary(object = df$Sex, quantile.type = 7) # Summary of the sex
 table(x = df$Sex) # Absolute frequency table of sex (ignores NAs)
 table(x = df$Sex, useNA = "ifany") # Absolute frequency table of sex (including NAs if present)
@@ -52,40 +54,27 @@ chisq.test(x = df$Sex, y = df$Smoke) # Pearson's chi-squared test for independen
 fisher.test(x = df$Sex, y = df$Smoke) # Fisher's exact test for independence between sex and smoke (useful for small samples)
 
 
-# 📚 Packages for summarizing data ####
 
-# Install and load multiple packages
-packages_list <- c("summarytools", "skimr", "Hmisc", "dplyr", "gt", "gtsummary")
-for (pkg in packages_list) {
-  if (!requireNamespace(pkg, quietly = TRUE)) {
-    install.packages(pkg)
-    message(pkg, " has been installed.")
-  } else {
-    message(pkg, " is already installed.")
-  }
-}
-lapply(packages_list, library, character.only = TRUE) 
+# 📚 Packages for summarizing data ####
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R")
+check_install_load_packages(c("summarytools", "skimr", "Hmisc", "dplyr", "gt", "gtsummary"))
 
 # summarytools
 browseURL("https://github.com/dcomtois/summarytools?tab=readme-ov-file") # Open summarytools GitHub page
-
 view(dfSummary(df)) # Detailed descriptive summary of the dataframe
 view(freq(x = df$Sex, report.nas = TRUE)) # Frequency table of sex including NA counts
 view(ctable(x = df$Sex, y = df$Smoke)) # Contingency table of sex by smoke
 
 # skimr
 browseURL("https://docs.ropensci.org/skimr/") # Open skimr documentation
-
 skim(df) # Quick skim of the dataframe showing mean, SD, missing, etc.
 
 # Hmisc
 browseURL("https://hbiostat.org/r/hmisc/") # Open Hmisc homepage
-
 describe(df) # Detailed description of each variable including counts, missing, percentiles, etc.
 
 # dplyr + gt
 browseURL("https://gt.rstudio.com/") # Open gt documentation
-
 df |> 
   summarise(
     Mean_Age = mean(x = Age, na.rm = TRUE), # Mean age
@@ -111,7 +100,6 @@ df |>
 
 # dplyr + gt + gtsummary
 browseURL("https://www.danieldsjoberg.com/gtsummary/") # Open gtsummary documentation
-
 df |>
   select(-Id) |> # Remove Id column from the summary
   tbl_summary(

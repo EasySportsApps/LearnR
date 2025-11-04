@@ -2,20 +2,26 @@
 library(help = "datasets") # List all datasets included in base R
 data(iris) # Load the "iris" dataset
 
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R") # Load a custom function from GitHub
+check_install_load_packages(c("ggplot2", "MASS")) # Execute the custom function to check, install, and load all required packages
+
 library(help = "MASS") # List all functions and datasets included in "MASS" package
-library("MASS") # Load "MASS" package
 data(package = "MASS") # Show all datasets available in "MASS" package
 data("cats") # Load the "cats" dataset
 data("cats", package = "MASS") # Load the "cats" dataset without loading entire package
 
 library(help = "ggplot2") # List all functions and datasets included in "ggplot2" package
-library("ggplot2") # Load "ggplot2" package
-data(diamonds) # Load "diamonds" dataset for visualization
+data(package = "MASS") # Show all datasets available in "ggplot2" package
+data("diamonds") # Load "diamonds" dataset for visualization
 data("diamonds", package = "ggplot2") # Load the "diamonds" dataset without loading entire package
+
+
 
 # 📁 Output directory ####
 output_dir <- "C:/Users/rhile/Desktop/LearnR/datasets" # Set base output folder
 dir.create(output_dir, showWarnings = FALSE) # Create folder if it doesn't exist (optional)
+
+
 
 # 📤 Export dataset to TXT ####
 write.table(iris, # Use the "iris" dataset
@@ -36,6 +42,8 @@ write.table(iris, # Use the "iris" dataset
             row.names = FALSE, # Do not include row names
             quote = FALSE) # Do not use quotes around text values
 
+
+
 # 📤 Export dataset to CSV ####
 write.csv(iris, # Use the "iris" dataset
           file = file.path(output_dir, "iris_comma.csv"), # Set output file path
@@ -47,16 +55,11 @@ write.csv2(iris, # Use the "iris" dataset
            row.names = FALSE, # Do not include row names
            quote = FALSE) # Do not use quotes around text values
 
+
+
 # 📤 Export dataset to XLSX/XLS ####
-packages_list <- c("openxlsx", "xlsx") # List of required packages available on CRAN
-for (pkg in packages_list) {  # Loop over each package in the list
-  if (!requireNamespace(pkg, quietly = TRUE)) { # Check if the package is NOT installed
-    install.packages(pkg) # Install the package from CRAN if missing
-    message(pkg, " has been installed.") # Inform the user that the package was installed
-  } else { # If the package is already installed
-    message(pkg, " is already installed.") # Inform the user that the package is available
-  }
-}
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R") # Load a custom function from GitHub
+check_install_load_packages(c("openxlsx", "xlsx")) # Execute the custom function to check, install, and load all required packages
 
 openxlsx::write.xlsx(iris,  # Load "openxlsx" package (recommended) and use the "iris" dataset
                      file = file.path(output_dir, "iris_openxlsxlib.xlsx")) # Set output file path
@@ -66,6 +69,7 @@ xlsx::write.xlsx(iris, # Load "xlsx" package and use the "iris" dataset
 
 xlsx::write.xlsx(iris, # Load "xlsx" package and use the "iris" dataset
                  file = file.path(output_dir, "iris_xlsxlib.xls")) # Set output file path
+
 
 
 # 📥 Import dataset from TXT ####
@@ -97,6 +101,8 @@ df_iris_semicolon_txt_github <- read.table(
   dec = "."  # Decimal point
 )
 
+
+
 # 📥 Import dataset from CSV ####
 df_iris_comma_csv_github <- read.csv(
   file = "https://raw.githubusercontent.com/EasySportsApps/LearnR/refs/heads/main/datasets/iris_comma.csv", # Public GitHub raw URL (can be read directly)
@@ -114,18 +120,11 @@ df_iris_semicolon_csv_github <- read.table(
 
 # Note: use read.csv2() if sep = ";" and dec = "," (European format)
 
-# 📥 Import dataset from XLSX/XLS ####
-packages_list <- c("readxl") # List of required packages available on CRAN
-for (pkg in packages_list) {  # Loop over each package in the list
-  if (!requireNamespace(pkg, quietly = TRUE)) { # Check if the package is NOT installed
-    install.packages(pkg) # Install the package from CRAN if missing
-    message(pkg, " has been installed.") # Inform the user that the package was installed
-  } else { # If the package is already installed
-    message(pkg, " is already installed.") # Inform the user that the package is available
-  }
-}
 
-library("readxl") # Load "readxl" package
+
+# 📥 Import dataset from XLSX/XLS ####
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R") # Load a custom function from GitHub
+check_install_load_packages("readxl") # Execute the custom function to check, install, and load all required packages
 
 df_iris_openxlsxlib_xlsx_local <-  read_excel(
   path = "C:/Users/rhile/Desktop/LearnR/datasets/iris_openxlsxlib.xlsx", # Local path
@@ -159,18 +158,11 @@ df_iris_xlsxlib_xls_github <- local({
 })
 df_iris_xlsxlib_xls_github <- df_iris_xlsxlib_xls_github[, -1] # Remove the first column
 
-# 📤📥 Export/import dataset with rio ####
-packages_list <- c("rio") # List of required packages available on CRAN
-for (pkg in packages_list) {  # Loop over each package in the list
-  if (!requireNamespace(pkg, quietly = TRUE)) { # Check if the package is NOT installed
-    install.packages(pkg) # Install the package from CRAN if missing
-    message(pkg, " has been installed.") # Inform the user that the package was installed
-  } else { # If the package is already installed
-    message(pkg, " is already installed.") # Inform the user that the package is available
-  }
-}
 
-library("rio") # Load "rio" package
+
+# 📤📥 Export/import dataset with rio ####
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R") # Load a custom function from GitHub
+check_install_load_packages("rio") # Execute the custom function to check, install, and load all required packages
 
 export(x = iris, # Use the "iris" dataset
        file = file.path(output_dir, "iris_tab.txt"), # Set output file path 
@@ -253,17 +245,11 @@ df_iris_xlsxlib_xls_github <- import( # Import public Github XLS dataset
 ) 
 df_iris_xlsxlib_xls_github <- df_iris_xlsxlib_xls_github[, -1] # Remove the first column
 
+
+
 # 📥 Import dataset from Private GitHub raw URL ####
-packages_list <- c("httr", "rio", "usethis", "stringr", "stringi")  # List of required packages available on CRAN
-for (pkg in packages_list) {  # Loop over each package in the list
-  if (!requireNamespace(pkg, quietly = TRUE)) { # Check if the package is NOT installed
-    install.packages(pkg) # Install the package from CRAN if missing
-    message(pkg, " has been installed.") # Inform the user that the package was installed
-  } else { # If the package is already installed
-    message(pkg, " is already installed.") # Inform the user that the package is available
-  }
-}
-lapply(packages_list, library, character.only = TRUE) # Load multiple packages
+source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R") # Load a custom function from GitHub
+check_install_load_packages(c("httr", "rio", "usethis", "stringr", "stringi")) # Execute the custom function to check, install, and load all required packages
 
 # 🔑 Set up GitHub Personal Access Token (PAT) for accessing private repos
 # Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) = https://github.com/settings/tokens
@@ -280,7 +266,6 @@ stop_for_status(response) # Check if the HTTP request was successful; stops exec
 temp_file <- tempfile(fileext = ".xlsx") # Create a temporary file to store the downloaded XLSX content
 writeBin(content(response, "raw"), temp_file) # Write the raw binary content of the response to the temporary file
 
-
 df_list_raw <- import_list(temp_file) # Import all sheets into a list of dataframes
 df_list <- list() # Initialize list to store cleaned dataframes
 
@@ -290,9 +275,7 @@ for (sheet_name in names(df_list_raw)) { # Loop through each sheet in the list
   name_clean <- str_replace_all(name_clean, "[^a-z0-9]", "_") # Replace spaces/non-alphanumeric with underscores
   name_clean <- str_replace_all(name_clean, "_+", "_") # Collapse multiple consecutive underscores
   name_clean <- str_replace(name_clean, "^_|_$", "") # Remove leading/trailing underscores
-  
   df_name <- paste0("df_", name_clean) # Add prefix 'df_'
-  
   df_list[[df_name]] <- df_list_raw[[sheet_name]] # Store dataframe in the cleaned list
   assign(df_name, df_list[[df_name]], envir = .GlobalEnv) # Optionally assign to global environment
 }
@@ -301,4 +284,4 @@ unlink(temp_file) # Delete the temporary file to clean up and free system resour
 
 df_list <- df_list[setdiff(names(df_list), "df_total")] # Remove the dataframe named "df_total" from the list "df_list"
 
-rm(packages_list, pkg, response, temp_file, df_list_raw, sheet_name, name_clean, df_name, df_total) # Remove unnecessary objects from the environment
+rm(response, temp_file, df_list_raw, sheet_name, name_clean, df_name, df_total) # Remove unnecessary objects from the environment
