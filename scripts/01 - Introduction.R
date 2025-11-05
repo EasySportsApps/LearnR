@@ -6,6 +6,7 @@ browseURL("https://positron.posit.co/download.html") # Open the official Positro
 
 
 # 📦 Install R packages ####
+browseURL("https://r-universe.dev/search") # Open R-universe package search site
 install.packages(c("installr", "remotes", "rstudioapi", "pak", "MASS", "ggplot2")) # Install multiple packages from CRAN
 remotes::install_github("talgalili/installr") # Install a package from GitHub using "remotes" package
 pak::pak("talgalili/installr") # Install a package from GitHub using "pak" package (faster, resolves dependencies)
