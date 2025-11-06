@@ -74,3 +74,5 @@ abline(v = mean(df$Age), col = "#000000", lty = 2, lwd = 2) # Mean age vertical 
 text(x = mean(df$Age), y = max(hist_freq$density)/2, # Add mean age text
      labels = paste("x̄ =", formatC(mean(df$Age), format = "f", digits = 1)),
      pos = 4, cex = 1.0, col = "#000000")
+
+# Hola Fork ####
