@@ -68,3 +68,5 @@ getwd() # Show current working directory
 setwd("C:/Users/rhile/Desktop/LearnR") # Set working directory (keyboard shortcut: Ctrl + Shift + H; RStudio menu path: Session > Set working directory > Choose Directory)
 cat("\014") # Clear console (keyboard shortcut: Ctrl + L)
 q() # Quit R (keyboard shortcut: Ctrl + Q)
+
+# HOLA
