@@ -31,7 +31,6 @@ text(x = mean(df$Age), y = max(freq_hist$counts)/2, # Add text
      labels = paste("x̄ =", formatC(mean(df$Age), format = "f", digits = 1)),,
      pos = 4, cex = 1.0, col = "#000000")
 
-
 dens_hist <- hist(x = df$Age, breaks = 4, freq = FALSE, # Create density histogram of age (continuous)
                   col = "#99DEF8", border = "#000000",
                   main = "Histogram", xlab = "Age (years)", ylab = "Density",
@@ -149,3 +148,21 @@ legend(x = "topright", inset = c(0, -0.1), # Add legend
        legend = c("No", "Yes"), col = c("#F44336", "#6AA84F"),
        pch = 15, pt.cex = 1.2, bty = "n")
 par(xpd = FALSE) # Reset plotting area to default
+
+
+
+# 🧪 Combine plots with base R libraries ####
+par(mfrow = c(2, 2)) # Combine 4 plots (2 rows x 2 columns) using the par function
+hist(x = df$Age, freq = TRUE) # Create simplified frequency histogram of Age
+boxplot(x = df$Age) # Create simplified boxplot of Age
+boxplot(formula = Age ~ Sex, data = df) # Create simplified boxplot comparing Age by Sex
+plot(x = df$Age, y = df$BMI) # Create simplified scatter plot: Age vs BMI
+par(mfrow = c(1, 1)) # Reset layout to single plot
+
+layout(mat = matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2), widths = c(1, 1), heights = c(1, 1)) # Combine 4 plots (2 rows x 2 columns, all plots same size) using the layout function
+hist(x = df$Age, freq = TRUE) # Create simplified frequency histogram of Age
+boxplot(x = df$Age) # Create simplified boxplot of Age
+boxplot(formula = Age ~ Sex, data = df) # Create simplified boxplot comparing Age by Sex
+plot(x = df$Age, y = df$BMI) # Create simplified scatter plot: Age vs BMI
+layout(1)  # Reset layout to default single plot
+
