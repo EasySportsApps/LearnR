@@ -19,6 +19,7 @@ df$Id <- as.integer(df$Id) # Convert Id variable to integer
 browseURL("https://www.color-hex.com/") # Open website to explore HEX color codes
 
 
+
 # 📊 Histogram #####
 freq_hist <- hist(x = df$Age, breaks = 4, freq = TRUE, # Create frequency histogram of age (continuous)
                   col = "#99DEF8", border = "#000000",
@@ -165,4 +166,3 @@ boxplot(x = df$Age) # Create simplified boxplot of Age
 boxplot(formula = Age ~ Sex, data = df) # Create simplified boxplot comparing Age by Sex
 plot(x = df$Age, y = df$BMI) # Create simplified scatter plot: Age vs BMI
 layout(1)  # Reset layout to default single plot
-
