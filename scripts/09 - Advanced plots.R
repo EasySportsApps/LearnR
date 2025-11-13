@@ -17,6 +17,7 @@ df$Id <- as.integer(df$Id) # Convert Id variable to integer
 
 # 📦 Check, install, and load R packages for graphics ####
 source("https://raw.githubusercontent.com/EasySportsApps/LearnR/main/functions/check_install_load_packages.R")
+check_install_load_packages(c("dplyr")) # Data manipulation
 check_install_load_packages(c("ggplot2", "lattice")) # Static graphics
 check_install_load_packages(c("plotly", "ggiraph", "highcharter")) # Interactive graphics
 check_install_load_packages(c("cowplot", "patchwork")) # Combination
@@ -35,33 +36,81 @@ browseURL("https://patchwork.data-imaginist.com/") # Open patchwork documentatio
 
 
 
-# 📘 Introduction to ggplot2 ####
-# Note: ggplot2 is a package for creating graphics, built around three essential components (data, mapping, layers)
-# and four optional components (scales, facets, coordinates, theme).
+# 🎨 Hex color codes ####
+browseURL("https://www.color-hex.com/") # Open website to explore HEX color codes
 
-# Data and mapping components
-ggplot(data = df, mapping = aes(x = Age, y = BMI, color = Sex)) +  # Specify dataset, axes, and color mapping
-  
-  # Layer component
-  geom_point(size = 3) + # Add scatter plot
-  
-  # Scale component: scale_{aesthetic}_{type}
-  scale_color_manual(values = c("Female" = "#99DEF8", "Male" = "#1F77B4")) +  # Custom colors for Sex variable
-  
-  # Facet component
-  facet_grid(rows = vars(Smoke), cols = vars(ParentsSmoke), labeller = label_both) + # Facet plot by Smoke and ParentsSmoke variables
-  
-  # Coordinate component
-  scale_x_continuous(name = "Age (years)", breaks = seq(floor(min(df$Age)), ceiling(max(df$Age)/5)*5, by = 5)) +  # Define X-axis ticks
-  scale_y_continuous(name = "BMI (m/kg²)", breaks = seq(floor(min(df$BMI)), ceiling(max(df$BMI)/2)*2, by = 2)) +  # Define Y-axis ticks
-  
-  # Theme component
-  labs(title = "Scatter plot") + # Add title and axis labels
-  theme_classic() +  # Clean minimal theme
-  theme(
-    legend.position = "top", # Define position legend at the top
-    panel.border = element_rect(color = "#000000", fill = NA), # Define facet borders color
-    strip.background = element_rect(color = "#000000", fill = "#FFFFFF"), # Define facet headers color
-    strip.text = element_text(face = "bold") # Facet header text bold
+
+
+# 🔵 ggplot2 demonstration (scatter plot) ####
+
+# Rename variables
+df <- df |>
+  rename(`Number of smoking parents` = ParentsSmoke,
+         `Smoking habit` = Smoke)
+
+# Create summary dataframe with mean Age and BMI by Number of smoking parents, Smoking habit, and Sex
+df_summary <- df |>
+  group_by(`Number of smoking parents`, `Smoking habit`, Sex) |>
+  summarise(
+    meanAge = mean(Age, na.rm = TRUE),
+    meanBMI = mean(BMI, na.rm = TRUE),
+    .groups = "drop"
   )
 
+# Create an advanced plot with ggplot2
+ggplot() + # Specify here the data and mapping components if the plot has only one layer
+  
+  # Data, mapping, and layers components (mandatory)  
+  geom_point(data = df, # Add individual points on scatter plots
+             mapping = aes(x = Age, y = BMI, color = Sex, shape = "Individual"), 
+             size = 3) + 
+  geom_point(data = df_summary, # Add mean points on scatter plots
+             mapping = aes(x = meanAge, y = meanBMI, color = Sex, shape = "Mean"), 
+             size = 4) +
+  # Note: for this or other geoms like geom_bar or geom_col, you can also map aesthetics like fill, size, or group
+  
+  # Scales component (optional): scale_{aesthetic}_{type}
+  scale_x_continuous(name = "Age (years)", # Set continuous variable Age (X-axis)
+                     breaks = seq(floor(min(df$Age)), ceiling(max(df$Age)/5)*5, by = 5)) + 
+  scale_y_continuous(name = "BMI (m/kg²)", # Set continuous variable BMI (Y-axis)
+                     breaks = seq(floor(min(df$BMI)), ceiling(max(df$BMI)/2)*2, by = 2)) + 
+  scale_color_manual(name = "Sex:", # Set color of categorical variable Sex
+                     values = c("Female" = "#E41A1C", "Male" = "#377EB8"),
+                     guide = guide_legend(order = 1)) + 
+  scale_shape_manual(name = "Point shape:", # Set shape of individual and mean points 
+                     values = c("Individual" = 16, "Mean" = 4),
+                     guide = guide_legend(order = 2)) + 
+  
+  # Facets component (optional)
+  facet_grid(cols = vars(`Number of smoking parents`), # Add facets by Number of smoking parents and Smoking habit categories
+             rows = vars(`Smoking habit`), 
+             labeller = label_both) + 
+  
+  # Coordinates component (optional)
+  coord_cartesian(xlim = c(floor(min(df$Age)), ceiling(max(df$Age)/5)*5), # Set visible range of axes in a Cartesian coordinate system
+                  ylim = c(floor(min(df$BMI)), ceiling(max(df$BMI)/2)*2)) +
+
+  # Theme component (optional)
+  labs( # Add title, subtitle, and caption
+    title = "Relationship between Age and BMI by Number of smoking parents, Smoking habit, and Sex",
+    subtitle = "Scatter plot with individual and mean points",
+    caption = "Note: simulated data") +
+  theme_classic() +  # Add classic theme
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 12), # Set title
+    plot.subtitle = element_text(face = "italic", hjust = 0.5, size = 11), # Set subtitle
+    plot.caption = element_text(face = "italic", hjust = 1, size = 10), # Set caption
+    
+    axis.title.x = element_text(face = "bold", size = 10),  # Set X-axis title
+    axis.title.y = element_text(face = "bold", size = 10),  # Set Y-axis title
+    
+    strip.background = element_rect(color = "#000000", fill = "#FFFFFF"), # Set facet background headers
+    strip.text = element_text(face = "bold", size = 10), # Set facet text header
+    panel.border = element_rect(color = "#000000", fill = NA), # Set facet borders
+    
+    legend.position = "bottom", # Set legend position
+    legend.background = element_rect(color = "#000000", fill = "#FFFFFF"), # Set legend border
+    legend.title = element_text(face = "bold", size = 9), # Set legend title
+    legend.text = element_text(size = 9), # Set legend text
+    legend.key.size = unit(0.8, "lines") # Set legend symbol
+  )
